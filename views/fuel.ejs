@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include("./partials/head.ejs") %>
+    <%- include("./partials/modal.ejs") %>
+<body>
+    
+    <%- include("./partials/nav.ejs") %>
+
+    <h2> <%= title %> </h2>
+    <div class = "content">
+        <section>
+        <% if (fuel.length > 0) { %>
+            <% fuel.forEach(fuel => { %>
+                <div class="content-card" onclick="handleCardClick(`<%= fuel.fuel_id %>`)">
+                  <h3 class="title"><%= fuel.fuel_name %></h3>
+                  <p class="price">Price: <%= fuel.price_per_liter %>/liter</p>
+                  <p class="stock">Stock Level: <%= fuel.stock_level %></p>
+                  <button onclick="event.stopPropagation(); openSellModal(`<%= fuel.fuel_id %>, <%= fuel.price_per_liter %>`)">Sell</button>
+                </div>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <p>There are no fuel to display...</p>
+          <% } %>
+    
+        </section>
+    </div>
+
+    <script>
+      let selectedFuelId = null;
+      function openSellModal(fuelId, pricePerLiter) {
+        document.getElementById('sellFuelId').value = fuelId;
+        document.getElementById('sellPrice').value = pricePerLiter;
+        document.getElementById('sellQuantity').value = '';
+        document.getElementById('machineId').value = '';
+        document.getElementById('sellModal').style.display = 'block';
+      }
+
+      function closeSellModal() {
+        document.getElementById('sellModal').style.display = 'none';
+      }
+
+      document.getElementById('sellForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fuel_id = parseInt(document.getElementById('sellFuelId').value);
+        const price_per_liter = parseFloat(document.getElementById('sellPrice').value);
+        const quantity_sold = parseFloat(document.getElementById('sellQuantity').value);
+        const machine_id = document.getElementById('machineId').value || null;
+        const total_price = quantity_sold * price_per_liter;
+
+        try {
+          const res = await fetch('/station/sell', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fuel_id, quantity_sold, total_price, machine_id })
+          });
+
+          if (res.ok) {
+            alert('Sale recorded successfully!');
+            closeSellModal();
+            location.reload();
+          } else {
+            alert('Failed to sell fuel.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error occurred.');
+        }
+      });
+
+      function handleCardClick(fuelId) {
+        selectedFuelId = fuelId;
+        document.getElementById("actionModal").style.display = "block";
+      }
+    
+      function closeModal() {
+        document.getElementById("actionModal").style.display = "none";
+      }
+    
+      // Button handlers
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("updateBtn").onclick = () => {
+          window.location.href = `/station/fuel/edit/${selectedFuelId}`;
+        };
+      });
+      // Close modal if clicked outside
+      window.onclick = function(event) {
+        const modal = document.getElementById("actionModal");
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+    </script>    
+    
+    <%- include("./partials/footer.ejs") %>
+</body>
+</html>

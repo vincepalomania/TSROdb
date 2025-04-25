@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include("./partials/head.ejs") %>
+    <%- include("./partials/modal.ejs") %>
+<body>
+    
+    <%- include("./partials/nav.ejs") %>
+
+    <h2> <%= title %> </h2>
+    <div class = "content">
+        <section>
+        <% if (sales.length > 0) { %>
+            <% sales.forEach(sales => { %>
+                <div class="content-card">
+                  <p class="price">Sales ID: <%= sales.sale_id %></p>
+                  <p class="price"><%= sales.fuel_name %></p>
+                  <p class="price"><%= sales.product_name %></p>
+                  <p class="price">Quantity Sold: <%= sales.quantity_sold %></p>
+                  <p class="stock">Total Price: <%= sales.total_price %></p>
+                  <p class="stock">Date: <%= sales.sale_date %></p>
+                </div>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <p>There are no sales to display...</p>
+          <% } %>
+    
+        </section>
+    </div>
+    
+    <%- include("./partials/footer.ejs") %>
+</body>
+</html>

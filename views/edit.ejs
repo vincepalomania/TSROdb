@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("./partials/head.ejs") %>
+</head>
+<body>
+    
+    <%- include("./partials/nav.ejs") %>
+
+    <div class="create-blog">
+          <h1>Edit Product</h1>
+        <form action="/station/fuel/edit/<%= fuel.fuel_id %>?_method=PUT" method="POST">
+          <input type="text" value="<%= fuel.fuel_name %>" id="snippet" name="fuel_name" required>
+          <label for="snippet">Price per Liter:</label>
+          <input type="text" value="<%= fuel.price_per_liter %>" id="snippet" name="price_per_liter" required>
+          <label for="snippet">Stock Level:</label>
+          <input type="text" value="<%= fuel.stock_level %>" id="snippet" name="stock_level" required>
+          <button>Save Changes</button>
+        </form>
+      </div>
+
+      <%- include("./partials/footer.ejs") %>
+</body>
+</html>

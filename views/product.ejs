@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include("./partials/head.ejs") %>
+    <%- include("./partials/productModal.ejs") %>
+
+<body>
+    
+    <%- include("./partials/nav.ejs") %>
+
+    <h2> <%= title %> </h2>
+    <div class = "content">
+        <section>
+        <% if (product.length > 0) { %>
+            <% product.forEach(product => { %>
+              <div class="content-card" onclick="handleCardClick(`<%= product.product_id %>`)">
+                  <h3 class="title"><%= product.product_name %></h3>
+                  <p class="price">Price: <%= product.price %></p>
+                  <p class="stock">Stock: <%= product.stock_quantity %></p>
+                  <button onclick="event.stopPropagation(), openSellModal(`<%= product.product_id %>, <%= product.price %>`)">Sell</button>
+                </div>
+              </a>
+            <% }) %>
+          <% } else { %>
+            <p>There are no product to display...</p>
+          <% } %>
+    
+        </section>
+    </div>
+
+    <script>
+      let selectedProductId = null;
+      function openSellModal(productId, price) {
+          document.getElementById('sellProductId').value = productId;
+          document.getElementById('sellProductPrice').value = price;
+          document.getElementById('sellProductQuantity').value = '';
+          document.getElementById('sellProductModal').style.display = 'block';
+        }
+
+        function closeSellProductModal() {
+          document.getElementById('sellProductModal').style.display = 'none';
+        }
+
+        document.getElementById('sellProductForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const product_id = parseInt(document.getElementById('sellProductId').value);
+          const price = parseFloat(document.getElementById('sellProductPrice').value);
+          const quantity_sold = parseFloat(document.getElementById('sellProductQuantity').value);
+          const total_price = price * quantity_sold;
+
+          try {
+            const res = await fetch('/station/sell-product', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ product_id, quantity_sold, total_price })
+            });
+
+            if (res.ok) {
+              alert('Sale recorded successfully!');
+              closeSellProductModal();
+              location.reload();
+            } else {
+              alert('Failed to sell product.');
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Error occurred.');
+          }
+        });
+
+      function handleCardClick(productId) {
+        selectedProductId = productId;
+        document.getElementById("actionModal").style.display = "block";
+      }
+    
+      function closeModal() {
+        document.getElementById("actionModal").style.display = "none";
+      }
+    
+      // Button handlers
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById("updateBtn").onclick = () => {
+          window.location.href = `/station/product/edit/${selectedProductId}`;
+        };
+      });
+    
+      // Close modal if clicked outside
+      window.onclick = function(event) {
+        const modal = document.getElementById("actionModal");
+        if (event.target === modal) {
+          closeModal();
+        }
+      };
+    </script>    
+
+    <%- include("./partials/footer.ejs") %>
+</body>
+</html>
